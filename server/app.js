@@ -14,6 +14,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('feed', feedRoutes);
+app.use('/feed', feedRoutes);
 
 app.listen(8080);

@@ -14,16 +14,17 @@ exports.getPosts = (req, res, next) => {
 }
 
 exports.createPosts = (req, res, next) => {
+  console.log(req.body)
   const { title, content } = req.body;
 
   res.status(201).json({
     message: 'Post created successfuly!',
-    posts: [{
+    post: {
       _id: new Date().toISOString(),
       title: title,
       content: content,
       creator: { name: 'Arkadii' },
       createdAt: new Date()
-    }]
+    }
   })
 }
