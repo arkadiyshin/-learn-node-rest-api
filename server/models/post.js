@@ -6,7 +6,7 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-  mageUrl: {
+  imageUrl: {
     type: String,
     required: true,
   },
