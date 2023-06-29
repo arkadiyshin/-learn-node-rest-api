@@ -19,6 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/feed', feedRoutes);
+
 app.use((error, req, res, next) => {
   const status = error.statusCode;
   const message = error.message;
