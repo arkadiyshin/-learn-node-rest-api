@@ -24,10 +24,6 @@ exports.createPosts = (req, res, next) => {
     const error = new Error('Validation failed, entered data is incorrect.');
     error.status = 422;
     throw error;
-    // return res.status(422).json({
-    //   message: 'Validation failed, entered data is incorrect.',
-    //   errors: errors.array()
-    // })
   }
 
   if (!req.file) {
@@ -43,8 +39,10 @@ exports.createPosts = (req, res, next) => {
     imageUrl: imageUrl,
     creator: { name: 'Arkadii' },
   });
-  post.save()
+  post
+    .save()
     .then(result => {
+      console.log(result)
       res.status(201).json({
         message: 'Post created successfuly!',
         post: result,
