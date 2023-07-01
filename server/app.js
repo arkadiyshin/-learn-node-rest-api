@@ -47,7 +47,8 @@ app.use('/auth', authRoutes);
 app.use((error, req, res, next) => {
   const status = error.statusCode;
   const message = error.message;
-  res.status(status).json({ message: message });
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
 })
 
 const MONGODB_URI = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.igv9dig.mongodb.net/messages?retryWrites=true&w=majority`;
