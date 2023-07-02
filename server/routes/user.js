@@ -1,4 +1,4 @@
-const userController = require('../models/user')
+const userController = require('../controllers/auth')
 
 const express = require('express');
 const { body } = require('express-validator');
@@ -33,3 +33,5 @@ router.put('/signup',
       .isEmpty()
   ],
   userController.signup);
+
+module.exports = router;
