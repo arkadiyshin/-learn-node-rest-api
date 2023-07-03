@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const feedRoutes = require('./routes/feed');
-const authRoutes = require('./routes/user');
+const authRoutes = require('./routes/auth');
 
 require('dotenv').config();
 
