@@ -57,7 +57,14 @@ mongoose
   .connect(MONGODB_URI)
   .then(result => {
     const server = app.listen(8080)
-    const io = require('socket.io')(server);
+    const io = require('socket.io')(server, {
+      cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true
+      }
+    });
     io.on('connection', socket => {
       console.log('Client connected!')
     })
