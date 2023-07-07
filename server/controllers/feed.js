@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const { validationResult } = require('express-validator');
+
+const io = require('../socket');
 const Post = require('../models/post');
 const User = require('../models/user');
 
@@ -29,7 +31,7 @@ exports.getPosts = async (req, res, next) => {
   }
 }
 
-exports.createPosts = async (req, res, next) => {
+exports.createPost = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed, entered data is incorrect.');
@@ -57,6 +59,7 @@ exports.createPosts = async (req, res, next) => {
     const user = await User.findById(req.userId);
     user.posts.push(post);
     await user.save();
+    io.getIo().emit('posts', { action: 'create', post: post })
     res.status(201).json({
       message: 'Post created successfuly!',
       post: post,
