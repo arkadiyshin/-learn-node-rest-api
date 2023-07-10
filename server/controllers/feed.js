@@ -186,7 +186,7 @@ exports.deletePost = async (req, res, next) => {
     io.getIo()
       .emit('posts', {
         action: 'delete',
-        post: result,
+        post: postId,
       })
     res.status(200).json({
       message: 'Post deleted!'
