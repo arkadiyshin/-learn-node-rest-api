@@ -9,7 +9,14 @@ const graphqlResolver = require('./graphql/resolvers');
 
 require('dotenv').config();
 
-const app = express();
+const handler = createHandler({
+  path: '/graphql',
+  schema: graphqlSchema,
+  rootValue: graphqlResolver,
+  graphiql: true
+});
+
+const app = express(handler);
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -42,10 +49,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.all('/graphql', createHandler({
-  schema: graphqlSchema,
-  rootValue: graphqlResolver
-}));
+app.use(handler);
 
 app.use((error, req, res, next) => {
   const status = error.statusCode;
