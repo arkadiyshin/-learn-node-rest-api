@@ -13,7 +13,17 @@ const handler = createHandler({
   path: '/graphql',
   schema: graphqlSchema,
   rootValue: graphqlResolver,
-  graphiql: true
+  graphiql: true,
+  formatError(err) {
+    if (!err.originalError) {
+      return err;
+    }
+    const data = err.originalError.data;
+    const message = err.message || 'An error occurred';
+    const code = err.code || 500;
+    return { message: message, status: code, data: data };
+
+  }
 });
 
 const app = express(handler);
