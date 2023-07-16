@@ -3,6 +3,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken')
 
 const User = require('../models/user');
+const Post = require('../models/post');
 require('dotenv').config();
 
 module.exports = {
@@ -43,6 +44,57 @@ module.exports = {
     }
 
   },
+
+  createPost: async function ({ postInput }, req) {
+    const { title, imageUrl, content } = postInput;
+
+    const errors = [];
+    if (validator.isEmpty(title) || !validator.isLength(title, { min: 5 })) {
+      errors.push({ message: 'Title is invalid.' })
+    }
+    if (validator.isEmpty(content) || !validator.isLength(content, { min: 5 })) {
+      errors.push({ message: 'Content is invalid.' })
+    }
+    if (errors.length > 0) {
+      const error = new Error('Invalid input.')
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+
+
+    // if (!req.file) {
+    //   const error = new Error('No image provided.')
+    //   error.statusCode = 422;
+    //   throw error;
+    // }
+
+    const post = new Post({
+      title: title,
+      content: content,
+      imageUrl: imageUrl,
+      //creator: req.userId,
+    });
+
+    try {
+      const createdPost = await post.save();
+      //const user = await User.findById(req.userId);
+      //user.posts.push(post);
+      //await user.save();
+      return {
+        ...createdPost,
+        _id: createdPost._id.toString(),
+        createdAt: createdPost.createdAt.toISOString(),
+        updatedAt: createdPost.updatedAt.toISOString(),
+      }
+    } catch (error) {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      throw error;
+    }
+  },
+
   login: async function ({ email, password }) {
     const errors = [];
     if (!validator.isEmail(email)) {
