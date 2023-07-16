@@ -7,6 +7,7 @@ const multer = require('multer');
 const { createHandler } = require('graphql-http/lib/use/express');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/resolvers');
+const auth = require('./middleware/auth');
 
 require('dotenv').config();
 
@@ -64,7 +65,7 @@ app.use('/images', express.static(path.join(__dirname, '/images')));
 //   next();
 // });
 app.use(cors());
-
+app.use(auth);
 app.use(handler);
 
 app.use((error, req, res, next) => {
