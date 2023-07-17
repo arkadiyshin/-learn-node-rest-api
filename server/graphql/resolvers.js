@@ -46,8 +46,9 @@ module.exports = {
   },
 
   createPost: async function ({ postInput }, req) {
+    //console.log(req);
     if (!req.isAuth) {
-      const error = new Error('Not authrnticatted')
+      const error = new Error('Not authenticated')
       error.code = 401;
       throw error;
     }
@@ -74,7 +75,7 @@ module.exports = {
     //   error.statusCode = 422;
     //   throw error;
     // }
-    const user = User.findById(req.userId);
+    const user = await User.findById(req.userId);
     if (!user) {
       const error = new Error('User not found.')
       error.code = 401;
@@ -94,7 +95,7 @@ module.exports = {
       user.posts.push(createdPost);
       await user.save();
       return {
-        ...createdPost,
+        ...createdPost._doc,
         _id: createdPost._id.toString(),
         createdAt: createdPost.createdAt.toISOString(),
         updatedAt: createdPost.updatedAt.toISOString(),
