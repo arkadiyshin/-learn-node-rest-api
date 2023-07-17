@@ -11,25 +11,25 @@ const auth = require('./middleware/auth');
 
 require('dotenv').config();
 
-const handler = createHandler({
-  path: '/graphql',
-  schema: graphqlSchema,
-  rootValue: graphqlResolver,
-  graphiql: true,
-  formatError(err) {
-    console.log(err)
-    if (!err.originalError) {
-      return err;
-    }
-    const data = err.originalError.data;
-    const message = err.message || 'An error occurred';
-    const code = err.code || 500;
-    return { message: message, status: code, data: data };
+// const handler = createHandler({
+//   path: '/graphql',
+//   schema: graphqlSchema,
+//   rootValue: graphqlResolver,
+//   graphiql: true,
+//   formatError(err) {
+//     console.log(err)
+//     if (!err.originalError) {
+//       return err;
+//     }
+//     const data = err.originalError.data;
+//     const message = err.message || 'An error occurred';
+//     const code = err.code || 500;
+//     return { message: message, status: code, data: data };
 
-  }
-});
+//   }
+// });
 
-const app = express(handler);
+const app = express();
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -55,18 +55,26 @@ const fileFilter = (req, file, cb) => {
 app.use(bodyParser.json());
 app.use(multer({ dest: 'images', storage: fileStorage, fileFilter: fileFilter }).single('image'));
 app.use('/images', express.static(path.join(__dirname, '/images')));
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-//   res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
-//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//   if (res.method === 'OPTIONS') {
-//     return res.sendStatus(200);
-//   }
-//   next();
-// });
+
 app.use(cors());
 app.use(auth);
-app.use(handler);
+//app.use(handler);
+app.all('/graphql', (req, res) =>
+  createHandler({
+    schema: graphqlSchema,
+    rootValue: {
+      createUser: args => graphqlResolver.createUser(args, req),
+      login: args => graphqlResolver.login(args, req),
+      createPost: args => graphqlResolver.createPost(args, req),
+      // posts: args => graphqlResolver.posts(args, req),
+      // post: args => graphqlResolver.post(args, req),
+      // updatePost: args => graphqlResolver.updatePost(args, req),
+      // deletePost: args => graphqlResolver.deletePost(args, req),
+      // user: args => graphqlResolver.user(args, req),
+      // updateStatus: args => graphqlResolver.updateStatus(args, req),
+    },
+  })(req, res)
+);
 
 app.use((error, req, res, next) => {
   const status = error.statusCode;
