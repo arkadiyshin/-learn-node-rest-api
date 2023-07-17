@@ -126,7 +126,7 @@ class Feed extends Component {
   };
 
   finishEditHandler = postData => {
-    console.log(postData)
+
     this.setState({
       editLoading: true
     });
@@ -135,29 +135,52 @@ class Feed extends Component {
     formData.append('title', postData.title);
     formData.append('content', postData.content);
     formData.append('image', postData.image);
-    let url = 'http://localhost:8080/feed/post';
-    let method = 'POST';
-
-    if (this.state.editPost) {
-      url = `http://localhost:8080/feed/post/${this.state.editPost._id}`;
-      method = 'PUT';
+    let graphqlQuery =
+    {
+      query: `
+        mutation {
+          createPost(postInput: {
+            title: "${postData.title}", 
+            imageUrl: "some picture", 
+            content: "${postData.content}",
+          })
+          {
+            _id
+            title
+            content
+            imageUrl
+            creator {
+              name
+            }
+            createdAt
+          }
+        }
+      `
     }
 
-    fetch(url, {
-      method: method,
-      body: formData,
+    console.log(graphqlQuery)
+    fetch(`http://localhost:8080/graphql`, {
+      method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.props.token}`
-      }
+        Authorization: `Bearer ${this.props.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(graphqlQuery),
     })
       .then(res => {
-        console.log(res.status, res)
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Creating or editing a post failed!');
-        }
+        console.log(res)
         return res.json();
       })
       .then(resData => {
+        console.log(resData);
+        if (resData.errors && resData.errors[0].status === 422) {
+          throw new Error(
+            "Validation failed."
+          );
+        }
+        if (resData.errors) {
+          throw new Error('Post adding failed.');
+        }
         // const post = {
         //   _id: resData.post._id,
         //   title: resData.post.title,
