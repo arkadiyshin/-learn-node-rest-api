@@ -33,8 +33,14 @@ module.exports = buildSchema(`
     password: String!
   }
 
+  type PostData {
+    posts: [Post]!
+    totalPosts: Int!
+  }
+
   type RootQuery {
     login(email: String!, password: String!) : AuthData!
+    posts: PostData
   }
 
   input PostInputData {
