@@ -6,6 +6,8 @@ const User = require('../models/user');
 const Post = require('../models/post');
 require('dotenv').config();
 
+const ITEMS_PER_PAGE = 2;
+
 module.exports = {
   createUser: async function (args, req) {
     const { email, name, password } = args.userInput;
@@ -139,17 +141,26 @@ module.exports = {
 
   },
 
-  posts: async function (args, req) {
+  posts: async function ({ page }, req) {
     if (!req.isAuth) {
       const error = new Error('Not authenticated')
       error.code = 401;
       throw error;
     }
+    if (!page) {
+      page = 1;
+    }
 
     const totalPosts = await Post.find().countDocuments();
+    // const posts = await Post.find()
+    //   .sort({ createdAt: -1 })
+    //   .populate('creator');
+
     const posts = await Post.find()
+      .populate('creator')
       .sort({ createdAt: -1 })
-      .populate('creator');
+      .skip((+page - 1) * ITEMS_PER_PAGE)
+      .limit(ITEMS_PER_PAGE);
 
     return {
       posts: posts.map(p => {
