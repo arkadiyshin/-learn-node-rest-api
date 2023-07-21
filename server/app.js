@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -57,6 +58,18 @@ app.use(multer({ dest: 'images', storage: fileStorage, fileFilter: fileFilter })
 app.use('/images', express.static(path.join(__dirname, '/images')));
 
 app.use(cors());
+app.put('/post-image', (req, res, next) => {
+  if (!req.auth) {
+    throw new Error('Not authenticated');
+  }
+  if (!req.file) {
+    return res.status(200).json({ message: 'No file provided' });
+  }
+  if (req.body.oldPath) {
+    clearImage(req.body.oldPath);
+  }
+  return res.status(200).json({ message: 'File stored', filePath: req.file.path })
+});
 app.use(auth);
 //app.use(handler);
 app.all('/graphql', (req, res) =>
@@ -93,3 +106,8 @@ mongoose
   .catch(err => {
     console.log(err)
   })
+
+const clearImage = (filePath) => {
+  filePath = path.join(__dirname, '..', filePath);
+  fs.unlink(filePath, err => console.log(err));
+}
