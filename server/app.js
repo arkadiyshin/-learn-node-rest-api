@@ -12,24 +12,6 @@ const auth = require('./middleware/auth');
 
 require('dotenv').config();
 
-// const handler = createHandler({
-//   path: '/graphql',
-//   schema: graphqlSchema,
-//   rootValue: graphqlResolver,
-//   graphiql: true,
-//   formatError(err) {
-//     console.log(err)
-//     if (!err.originalError) {
-//       return err;
-//     }
-//     const data = err.originalError.data;
-//     const message = err.message || 'An error occurred';
-//     const code = err.code || 500;
-//     return { message: message, status: code, data: data };
-
-//   }
-// });
-
 const app = express();
 
 const fileStorage = multer.diskStorage({
@@ -71,7 +53,6 @@ app.put('/post-image', (req, res, next) => {
   return res.status(200).json({ message: 'File stored', filePath: req.file.path })
 });
 app.use(auth);
-//app.use(handler);
 app.all('/graphql', (req, res) =>
   createHandler({
     schema: graphqlSchema,
